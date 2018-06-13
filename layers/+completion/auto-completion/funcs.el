@@ -69,12 +69,12 @@ Available PROPS:
   (let* ((backends (spacemacs/mplist-get props :backends))
          (modes (spacemacs/mplist-get props :modes))
          (variables (spacemacs/mplist-get props :variables))
-         (from (plist-get props :from))
+         (from (spacemacs/plist-get props :from))
          (hooks (if (memq :append-hooks props)
-                    (plist-get props :append-hooks)
+                    (spacemacs/plist-get props :append-hooks)
                   t))
          (call-hooks (when (memq :call-hooks props)
-                       (plist-get props :call-hooks)))
+                       (spacemacs/plist-get props :call-hooks)))
          (result '(progn)))
     (dolist (mode modes)
       (let ((backends-var-name (intern (format "company-backends-%S" mode)))
@@ -289,7 +289,7 @@ MODE parameter must match the :modes values used in the call to
   (cond
    ((or (eq 'vim style)
         (and (eq 'hybrid style)
-             hybrid-mode-enable-hjkl-bindings))
+             hybrid-style-enable-hjkl-bindings))
     (let ((map company-active-map))
       (define-key map (kbd "C-j") 'company-select-next)
       (define-key map (kbd "C-k") 'company-select-previous)
@@ -331,6 +331,16 @@ MODE parameter must match the :modes values used in the call to
   (spacemacs/load-yasnippet)
   (require 'helm-c-yasnippet)
   (call-interactively 'helm-yas-complete))
+
+
+;; ivy-yas
+
+(defun spacemacs/ivy-yas ()
+  "Lazy load ivy-yasnippet"
+  (interactive)
+  (spacemacs/load-yasnippet)
+  (require 'ivy-yasnippet)
+  (call-interactively 'ivy-yasnippet))
 
 
 ;; Yasnippet

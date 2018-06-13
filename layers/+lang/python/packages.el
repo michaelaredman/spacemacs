@@ -48,26 +48,30 @@
 
 (defun python/init-anaconda-mode ()
   (use-package anaconda-mode
-    :init (setq anaconda-mode-installation-directory
-                (concat spacemacs-cache-directory "anaconda-mode"))
-    :config
+    :defer t
+    :init
     (progn
+      (add-hook 'python-mode-hook 'anaconda-mode)
       (spacemacs/set-leader-keys-for-major-mode 'python-mode
         "hh" 'anaconda-mode-show-doc
         "ga" 'anaconda-mode-find-assignments
         "gb" 'anaconda-mode-go-back
         "gu" 'anaconda-mode-find-references)
-
-      (evilified-state-evilify-map anaconda-view-mode-map
-        :mode anaconda-view-mode
-        :bindings
-        (kbd "q") 'quit-window
-        (kbd "C-j") 'next-error-no-select
-        (kbd "C-k") 'previous-error-no-select
-        (kbd "RET") 'spacemacs/anaconda-view-forward-and-push)
-
+      (setq anaconda-mode-installation-directory
+            (concat spacemacs-cache-directory "anaconda-mode")))
+    :config
+    (progn
+      ;; new anaconda-mode (2018-06-03) removed `anaconda-view-mode-map' in
+      ;; favor of xref. Eventually we need to remove this part.
+      (when (boundp 'anaconda-view-mode-map)
+        (evilified-state-evilify-map anaconda-view-mode-map
+          :mode anaconda-view-mode
+          :bindings
+          (kbd "q") 'quit-window
+          (kbd "C-j") 'next-error-no-select
+          (kbd "C-k") 'previous-error-no-select
+          (kbd "RET") 'spacemacs/anaconda-view-forward-and-push))
       (spacemacs|hide-lighter anaconda-mode)
-
       (defadvice anaconda-mode-goto (before python/anaconda-mode-goto activate)
         (evil--jumps-push)))))
 
@@ -133,6 +137,7 @@
 
 (defun python/init-importmagic ()
   (use-package importmagic
+    :defer t
     :init
     (progn
       (add-hook 'python-mode-hook 'importmagic-mode)
@@ -149,7 +154,8 @@
 
 (defun python/init-lsp-python ()
   (use-package lsp-python
-    :commands lsp-python-enable))
+    :commands lsp-python-enable
+    :init (add-hook 'python-mode-hook 'lsp-mode)))
 
 (defun python/init-nose ()
   (use-package nose

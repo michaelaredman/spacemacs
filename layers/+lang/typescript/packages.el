@@ -15,10 +15,12 @@
         company
         eldoc
         flycheck
+        lsp-mode
         smartparens
         tide
         typescript-mode
         web-mode
+        yasnippet
         ))
 
 (defun typescript/post-init-add-node-modules-path ()
@@ -39,8 +41,12 @@
   (spacemacs/enable-flycheck 'typescript-mode)
   (spacemacs/enable-flycheck 'typescript-tsx-mode)
   (with-eval-after-load 'tide
-    (flycheck-add-mode 'typescript-tide 'typescript-tsx-mode))
-  (flycheck-add-mode 'typescript-tslint 'typescript-tsx-mode))
+    (with-eval-after-load 'flycheck
+      (flycheck-add-mode 'typescript-tide 'typescript-tsx-mode)
+      (flycheck-add-mode 'typescript-tslint 'typescript-tsx-mode))))
+
+(defun typescript/post-init-lsp-mode ()
+  (add-hook 'typescript-mode-hook 'lsp-mode))
 
 (defun typescript/post-init-smartparens ()
   (if dotspacemacs-smartparens-strict-mode
@@ -87,6 +93,10 @@
 (defun typescript/post-init-web-mode ()
   (define-derived-mode typescript-tsx-mode web-mode "TypeScript-tsx")
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-tsx-mode)))
+
+(defun typescript/post-init-yasnippet ()
+  (spacemacs/add-to-hooks #'spacemacs/typescript-yasnippet-setup '(typescript-mode-hook
+                                                     typescript-tsx-mode-hook)))
 
 (defun typescript/init-typescript-mode ()
   (use-package typescript-mode

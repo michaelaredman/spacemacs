@@ -317,9 +317,8 @@
     :defer t
     :init
     (progn
-      (with-eval-after-load 'info
-        (require 'info+))
-      (setq Info-fontify-angle-bracketed-flag nil))))
+      (setq Info-fontify-angle-bracketed-flag nil)
+      (add-hook 'Info-mode-hook (lambda () (require 'info+))))))
 
 (defun spacemacs-navigation/init-open-junk-file ()
   (use-package open-junk-file
@@ -328,7 +327,12 @@
     :init
     (progn
       (setq open-junk-file-format (concat spacemacs-cache-directory "junk/%Y/%m/%d-%H%M%S."))
-      (spacemacs/set-leader-keys "fJ" 'spacemacs/open-junk-file))))
+      (spacemacs/set-leader-keys "fJ" 'spacemacs/open-junk-file)
+      ;; function to run open-junk-file hooks is buggy when opening a large file
+      ;; and Emacs warns about it.
+      ;; Since this is not really useful to add hooks to open-junk-files lets remove
+      ;; it
+      (remove-hook 'find-file-hook 'find-file-hook--open-junk-file))))
 
 (defun spacemacs-navigation/init-paradox ()
   (use-package paradox

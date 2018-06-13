@@ -20,9 +20,10 @@
 
 (defconst spacemacs-dump-buffer-name "*spacemacs-dumper*")
 
-(defun spacemacs/defer ()
-  "Return non-nil if dump is not supported."
-  (eq 'not-dumped spacemacs-dump-mode))
+(defun spacemacs/defer (&optional idle-time)
+  "Return t or IDLE-TIME when Spacemacs is not running from a dump."
+  (when (eq 'not-dumped spacemacs-dump-mode)
+    (or idle-time t)))
 
 (defmacro spacemacs|require (&rest args)
   "Require feature if dumping."
@@ -60,7 +61,9 @@ You should not used this function, it is reserved for some specific process."
 (defun spacemacs/emacs-with-pdumper-set-p ()
   "Return non-nil if a portable dumper capable emacs executable is set."
   (and dotspacemacs-enable-emacs-pdumper
-       (file-exists-p dotspacemacs-emacs-pdumper-executable-file)))
+       (file-exists-p
+        (locate-file dotspacemacs-emacs-pdumper-executable-file
+                     exec-path exec-suffixes 'file-executable-p))))
 
 (defun spacemacs/dump-emacs ()
   "Dump emacs in a subprocess."

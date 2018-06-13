@@ -60,7 +60,7 @@ or `spacemacs'.")
 to compile Emacs 27 from source following the instructions in file
 EXPERIMENTAL.org at to root of the git repository.")
 
-(defvar dotspacemacs-emacs-pdumper-executable-file "emacs"
+(defvar dotspacemacs-emacs-pdumper-executable-file "emacs-27.0.50"
   "File path pointing to emacs 27.1 executable compiled with support for the
 portable dumper (this is currently the branch pdumper.")
 
@@ -226,19 +226,6 @@ emacs.")
   "Default font, or prioritized list of fonts. This setting has no effect when
 running Emacs in terminal.")
 
-(defvar dotspacemacs-remap-Y-to-y$ nil
-  "If non nil `Y' is remapped to `y$' in Evil states.")
-
-(defvar dotspacemacs-retain-visual-state-on-shift t
-  "If non-nil, the shift mappings `<' and `>' retain visual state
-if used there.")
-
-(defvar dotspacemacs-visual-line-move-text nil
-  "If non-nil, J and K move lines up and down when in visual mode.")
-
-(defvar dotspacemacs-ex-substitute-global nil
-  "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
-
 (defvar dotspacemacs-folding-method 'evil
   "Code folding method. Possible values are `evil' and `origami'.")
 
@@ -329,7 +316,9 @@ can be toggled through `toggle-transparency'.")
   "If non nil show the color guide hint for transient state keys.")
 
 (defvar dotspacemacs-mode-line-unicode-symbols t
-  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
+  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters).
+If you use Emacs as a daemon and wants unicode characters only in GUI set
+the value to quoted `display-graphic-p'. (default t)")
 
 (defvar dotspacemacs-smooth-scrolling t
   "If non nil smooth scrolling (native-scrolling) is enabled.
@@ -774,10 +763,10 @@ error recovery."
                       emacs
                       hybrid))
           (and (listp x)
-               (eq 'hybrid (car x))
+               (member (car x) '(vim emacs hybrid))
                (spacemacs/mplist-get x :variables))))
     'dotspacemacs-editing-style
-    "is \'vim, \'emacs or \'hybrid or and list with `:variable' keyword")
+    "is \'vim, \'emacs or \'hybrid or and list with `:variables' keyword")
    (spacemacs//test-var
     (lambda (x)
       (let ((themes '(spacemacs
