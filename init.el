@@ -15,6 +15,7 @@
 ;; Avoid garbage collection during startup.
 ;; see `SPC h . dotspacemacs-gc-cons' for more info
 (defconst emacs-start-time (current-time))
+(setq gc-cons-threshold 702653184 gc-cons-percentage 0.6)
 (load (concat (file-name-directory load-file-name)
               "core/core-versions.el")
       nil (not init-file-debug))
@@ -23,7 +24,6 @@
       nil (not init-file-debug))
 (load (concat spacemacs-core-directory "core-dumper.el")
       nil (not init-file-debug))
-(setq gc-cons-threshold 702653184 gc-cons-percentage 0.6)
 
 (if (not (version<= spacemacs-emacs-min-version emacs-version))
     (error (concat "Your version of Emacs (%s) is too old. "
