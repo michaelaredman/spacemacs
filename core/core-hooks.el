@@ -47,14 +47,17 @@ If FUNC is a lambda you must give it a name with FNAME. "
         result)
     (setq result
           (append (when fname
-                    `((fset ',fname (lambda () (funcall #',func)))))
-                  `((fset ',hfunc (lambda ()
+                    `((fset ',fname (lambda (&rest _) (funcall #',func)))))
+                  `((fset ',hfunc (lambda (&rest _)
                                     ,(if fname (list fname) (list func))
                                     ,(if (functionp hook)
                                          `(advice-remove ',hook ',hfunc)
                                        `(remove-hook ',hook ',hfunc))
-                                    (fmakunbound ',hfunc)
-                                    ,(when fname `(fmakunbound ',fname)))))
+                                    ;; instead of unbinding we reset the
+                                    ;; functions to be the `ignore' function.
+                                    ;; see: https://github.com/syl20bnr/spacemacs/issues/10930
+                                    (fset ',hfunc 'ignore)
+                                    ,(when fname `(fset ',fname 'ignore)))))
                   (if (functionp hook)
                       `((advice-add ',hook :before ',hfunc))
                     `((add-hook ',hook ',hfunc)))))

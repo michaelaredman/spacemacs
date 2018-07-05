@@ -15,6 +15,11 @@
 (defconst dotspacemacs-test-results-buffer "*dotfile-test-results*"
   "Name of the buffer to display dotfile test results.")
 
+(defvar dotspacemacs--user-config-elapsed-time 0
+  "Time spent in `dotspacemacs/user-config' function.
+Useful for users in order to given them a hint of potential bottleneck in
+their configuration.")
+
 (let* ((env (getenv "SPACEMACSDIR"))
        (env-dir (when env (expand-file-name (concat env "/"))))
        (env-init (and env-dir (expand-file-name "init.el" env-dir)))
@@ -348,6 +353,12 @@ restricts line-number to the specified list of major-mode.")
 (defvar dotspacemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting.")
 
+(defvar dotspacemacs-server-socket-dir nil
+  "Set the emacs server socket location.
+If nil, uses whatever the Emacs default is,
+otherwise a directory path like \"~/.emacs.d/server\".
+Has no effect if `dotspacemacs-enable-server' is nil.")
+
 (defvar dotspacemacs-smartparens-strict-mode nil
   "If non-nil smartparens-strict-mode will be enabled in programming modes.")
 
@@ -427,6 +438,21 @@ are caught and signaled to user in spacemacs buffer."
                                            (error-message-string err))
                                    t))))))
 
+(defun dotspacemacs/call-user-env ()
+  "Call the function `dotspacemacs/user-env'."
+  (interactive)
+  (dotspacemacs|call-func dotspacemacs/user-env "Calling dotfile user env..."))
+
+(defun dotspacemacs/go-to-function (func)
+  "Open the dotfile and goes to FUNC function."
+  (interactive)
+  (find-function func))
+
+(defun dotspacemacs/go-to-user-env ()
+  "Go to the `dotspacemacs/user-env' function."
+  (interactive)
+  (dotspacemacs/go-to-function 'dotspacemacs/user-env))
+
 (defun dotspacemacs//check-layers-changed ()
   "Check if the value of `dotspacemacs-configuration-layers'
 changed, and issue a warning if it did."
@@ -445,7 +471,7 @@ the symbol of an editing style and the cdr is a list of keyword arguments like
   (cond
    ((symbolp config) config)
    ((listp config)
-    (let ((variables (spacemacs/mplist-get config :variables)))
+    (let ((variables (spacemacs/mplist-get-values config :variables)))
       (while variables
         (let ((var (pop variables)))
           (if (consp variables)
@@ -479,6 +505,14 @@ Returns non nil if the layer has been effectively inserted."
     (load-file (dotspacemacs/location))
     t))
 
+(defun dotspacemacs//profile-user-config (f &rest args)
+  "Compute time taken by the `dotspacemacs/user-config' function.
+Set the variable"
+  (let ((stime (current-time)))
+    (apply f args)
+    (setq dotspacemacs--user-config-elapsed-time
+          (float-time (time-subtract (current-time) stime)))))
+
 (defun dotspacemacs/sync-configuration-layers (&optional arg)
   "Synchronize declared layers in dotfile with spacemacs.
 
@@ -501,6 +535,7 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
                 (setq dotspacemacs-editing-style
                       (dotspacemacs//read-editing-style-config
                        dotspacemacs-editing-style))
+                (dotspacemacs/call-user-env)
                 ;; try to force a redump when reloading the configuration
                 (let ((spacemacs-force-dump t))
                   (configuration-layer/load))
@@ -515,7 +550,7 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
             (spacemacs-buffer/warning "Some tests failed, check `%s' buffer"
                                       dotspacemacs-test-results-buffer))))))
   (when (configuration-layer/package-used-p 'spaceline)
-    (spacemacs//set-powerline-for-startup-buffers)))
+    (spacemacs//restore-buffers-powerline)))
 
 (defun dotspacemacs/get-variable-string-list ()
   "Return a list of all the dotspacemacs variables as strings."
@@ -623,7 +658,8 @@ If ARG is non nil then Ask questions to the user before installing the dotfile."
     (if (file-exists-p dotspacemacs)
         (unless (with-demoted-errors "Error loading .spacemacs: %S"
                   (load dotspacemacs))
-          (dotspacemacs/safe-load)))))
+          (dotspacemacs/safe-load))))
+  (advice-add 'dotspacemacs/user-config :around 'dotspacemacs//profile-user-config))
 
 (defun spacemacs/title-prepare (title-format)
   "A string is printed verbatim except for %-constructs.
@@ -764,7 +800,7 @@ error recovery."
                       hybrid))
           (and (listp x)
                (member (car x) '(vim emacs hybrid))
-               (spacemacs/mplist-get x :variables))))
+               (spacemacs/mplist-get-values x :variables))))
     'dotspacemacs-editing-style
     "is \'vim, \'emacs or \'hybrid or and list with `:variables' keyword")
    (spacemacs//test-var

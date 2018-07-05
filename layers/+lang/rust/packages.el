@@ -72,7 +72,6 @@
     :defer t
     :init
     (progn
-      (spacemacs/copy-env-list '("RUST_SRC_PATH"))
       (spacemacs/set-leader-keys-for-major-mode 'rust-mode
         "=" 'rust-format-buffer
         "q" 'spacemacs/rust-quick-run))))
@@ -98,6 +97,7 @@
     :init
     (progn
       (spacemacs/add-to-hook 'rust-mode-hook '(racer-mode))
+      (spacemacs/add-to-hook 'racer-mode-hook '(eldoc-mode))
       (spacemacs/declare-prefix-for-mode 'rust-mode "mg" "goto")
       (add-to-list 'spacemacs-jump-handlers-rust-mode 'racer-find-definition)
       (spacemacs/declare-prefix-for-mode 'rust-mode "mh" "help")

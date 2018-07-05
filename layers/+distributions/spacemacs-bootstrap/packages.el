@@ -18,15 +18,12 @@
         (bind-key :step bootstrap)
         (diminish :step bootstrap)
         (evil :step bootstrap)
-        (exec-path-from-shell :step bootstrap
-                              :toggle (or (spacemacs/system-is-mac)
-                                          (spacemacs/system-is-linux)
-                                          (eq window-system 'x)))
         (hydra :step bootstrap)
         (use-package :step bootstrap)
         (which-key :step bootstrap)
         ;; pre packages, initialized aftert the bootstrap packages
         ;; these packages can use use-package
+        (dotenv-mode :step pre)
         (evil-evilified-state :location local :step pre :protected t)
         (pcre2el :step pre)
         (holy-mode :location local :step pre)
@@ -44,6 +41,10 @@
 (defun spacemacs-bootstrap/init-diminish ()
   (when (not (configuration-layer/package-used-p 'spaceline))
     (add-hook 'after-load-functions 'spacemacs/diminish-hook)))
+
+(defun spacemacs-bootstrap/init-dotenv-mode ()
+  (use-package dotenv-mode
+    :defer t))
 
 (defun spacemacs-bootstrap/init-bind-map ()
   (require 'bind-map)
@@ -97,7 +98,9 @@
   (define-key evil-window-map (kbd "<right>") 'evil-window-right)
   (define-key evil-window-map (kbd "<up>") 'evil-window-up)
   (define-key evil-window-map (kbd "<down>") 'evil-window-down)
-  (spacemacs/set-leader-keys "re" 'evil-show-registers)
+  (spacemacs/set-leader-keys
+    "re" 'evil-show-registers
+    "sc" 'spacemacs/evil-search-clear-highlight)
   ;; motions keys for help buffers
   (evil-define-key 'motion help-mode-map (kbd "<escape>") 'quit-window)
   (evil-define-key 'motion help-mode-map (kbd "<tab>") 'forward-button)
@@ -286,9 +289,6 @@
   (evil-declare-ignore-repeat 'spacemacs/next-error)
   (evil-declare-ignore-repeat 'spacemacs/previous-error))
 
-(defun spacemacs-bootstrap/init-exec-path-from-shell ()
-  (spacemacs//initialize-exec-path-from-shell))
-
 (defun spacemacs-bootstrap/init-hydra ()
   (require 'hydra)
   (setq hydra-key-doc-function 'spacemacs//hydra-key-doc-function
@@ -325,6 +325,7 @@
            ("spacemacs/toggle-\\(.+\\)" . "\\1")
            ("spacemacs/alternate-buffer" . "last buffer")
            ("spacemacs/toggle-mode-line-\\(.+\\)" . "\\1")
+           ("lazy-helm/\\(.+\\)" . "\\1")
            ("avy-goto-word-or-subword-1" . "avy word")
            ("shell-command" . "shell cmd")
            ("spacemacs/default-pop-shell" . "open shell")
