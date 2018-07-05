@@ -25,18 +25,23 @@
    dotspacemacs-configuration-layers
    '(html
      markdown
-     python
      haskell
      (c-c++ :variables
             c-c++-enable-clang-support t)
-     shell
+     (shell :variables
+            shell-default-term-shell "/bin/bash"
+            shell-default-height 30
+            shell-default-position 'bottom)
+     python
      colors
-     helm
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-enable-snippets-in-popup t)
      better-defaults
      emacs-lisp
      git
+     lsp
      gtags
+     games
      ess
      ranger
      ibuffer
@@ -45,18 +50,25 @@
           org-enable-bootstrap-support t)
      (latex :variables latex-enable-folding t)
      bibtex
-     (shell :variables
-            shell-default-height 30
-            shell-default-position 'bottom)
      ;; (spell-checking :variables spell-checking-enable-by-default nil)
      syntax-checking
      version-control
+     pandoc
+     spotify
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(doom-themes stan-mode stan-snippets solarized-theme org-gcal noflet pretty-mode ox-twbs)
+   dotspacemacs-additional-packages '(doom-themes
+                                      stan-mode stan-snippets
+                                      solarized-theme
+                                      org-gcal
+                                      noflet
+                                      pretty-mode
+                                      ox-twbs
+                                      free-keys
+                                      helm-spotify-plus)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -124,13 +136,16 @@ values."
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(doom-dracula
+                         spacemacs-dark
                          doom-one
-                         spacemacs-light)
+                         spacemacs-light
+                         doom-molokai
+                         rebecca)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -211,7 +226,7 @@ values."
    dotspacemacs-enable-paste-transient-state nil
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
-   dotspacemacs-which-key-delay 0.4
+   dotspacemacs-which-key-delay 0.7
    ;; Which-key frame position. Possible values are `right', `bottom' and
    ;; `right-then-bottom'. right-then-bottom tries to display the frame to the
    ;; right; if there is insufficient space it displays it at the bottom.
@@ -279,7 +294,7 @@ values."
    dotspacemacs-highlight-delimiters 'all
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server t
+   dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
@@ -379,7 +394,7 @@ This function is called at the very end of Spacemacs initialization."
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(custom-safe-themes
    (quote
-    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "ecba61c2239fbef776a72b65295b88e5534e458dfe3e6d7d9f9cb353448a569e" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "9d9fda57c476672acd8c6efeb9dc801abea906634575ad2c7688d055878e69d6" default)))
+    ("a566448baba25f48e1833d86807b77876a899fc0c3d33394094cf267c970749f" "b35a14c7d94c1f411890d45edfb9dc1bd61c5becd5c326790b51df6ebf60f402" "f0dc4ddca147f3c7b1c7397141b888562a48d9888f1595d69572db73be99a024" "1c082c9b84449e54af757bcae23617d11f563fc9f33a832a8a2813c4d7dfb652" "151bde695af0b0e69c3846500f58d9a0ca8cb2d447da68d7fbf4154dcf818ebc" "72a097f48e588eaa08b17027ac20304dd3b3ea8ceaca4ca553fb2577b64f4d09" "a4df5d4a4c343b2712a8ed16bc1488807cd71b25e3108e648d4a26b02bc990b3" "8891c81848a6cf203c7ac816436ea1a859c34038c39e3cf9f48292d8b1c86528" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "ecba61c2239fbef776a72b65295b88e5534e458dfe3e6d7d9f9cb353448a569e" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "9d9fda57c476672acd8c6efeb9dc801abea906634575ad2c7688d055878e69d6" default)))
  '(evil-want-Y-yank-to-eol t)
  '(fci-rule-color "#5B6268" t)
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
@@ -387,7 +402,7 @@ This function is called at the very end of Spacemacs initialization."
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(package-selected-packages
    (quote
-    (web-mode org-ref org-mime helm-bibtex flycheck-rtags emmet-mode anaconda-mode counsel swiper ivy flycheck smartparens highlight haskell-mode window-purpose imenu-list rtags helm helm-core projectile avy magit pythonic yasnippet company-auctex auctex-latexmk auctex pretty-mode flycheck-pos-tip pos-tip flycheck-haskell disaster company-c-headers cmake-mode clang-format helm-gtags ggtags org-gcal request-deferred deferred noflet solarized-theme ibuffer-projectile stan-snippets stan-mode rainbow-mode rainbow-identifiers color-identifiers-mode all-the-icons memoize doom-themes magit-popup git-commit ghub alert log4e git-gutter-fringe toc-org ranger async org-category-capture gntp org-plus-contrib markdown-toc markdown-mode git-gutter-fringe+ fringe-helper git-gutter+ with-editor dash git-gutter gh-md flyspell-correct-helm flyspell-correct ess-smart-equals ess-R-data-view ctable ess julia-mode auto-dictionary org-checklist diff-hl mmm-mode yapfify xterm-color ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package unfill spaceline smeargle shell-pop restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree mwim multi-term move-text magit-gitflow macrostep lorem-ipsum live-py-mode linum-relative link-hint intero info+ indent-guide hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav dumb-jump define-word cython-mode company-statistics company-ghci company-ghc company-cabal company-anaconda column-enforce-mode cmm-mode clean-aindent-mode auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+    (solaire-mode dracula-theme helm-spotify-plus company-auctex auctex-latexmk auctex pretty-mode flycheck-pos-tip pos-tip flycheck-haskell disaster company-c-headers cmake-mode clang-format helm-gtags ggtags org-gcal request-deferred deferred noflet solarized-theme ibuffer-projectile stan-snippets stan-mode rainbow-mode rainbow-identifiers color-identifiers-mode all-the-icons memoize doom-themes magit-popup git-commit ghub alert log4e git-gutter-fringe toc-org ranger async org-category-capture gntp org-plus-contrib markdown-toc markdown-mode git-gutter-fringe+ fringe-helper git-gutter+ with-editor dash git-gutter gh-md flyspell-correct-helm flyspell-correct ess-smart-equals ess-R-data-view ctable ess julia-mode auto-dictionary org-checklist diff-hl mmm-mode yapfify xterm-color ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package unfill spaceline smeargle shell-pop restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree mwim multi-term move-text magit-gitflow macrostep lorem-ipsum live-py-mode linum-relative link-hint intero info+ indent-guide hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav dumb-jump define-word cython-mode company-statistics company-ghci company-ghc company-cabal company-anaconda column-enforce-mode cmm-mode clean-aindent-mode auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
  '(spaceline-helm-mode t)
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map

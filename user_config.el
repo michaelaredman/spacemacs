@@ -1,78 +1,58 @@
 (defun dotspacemacs/user-config ()
 
+  ;; manually set shell $PATH
+  (setenv "PATH"
+          (concat
+           "/Users/Mike/anaconda/bin" ":"
+           "/Library/Frameworks/Python.framework/Versions/3.4/bin" ":"
+           "/usr/local/bin:/usr/bin" ":"
+           "/bin" ":"
+           "/usr/sbin" ":"
+           "/sbin" ":"
+           "/Library/TeX/texbin" ":"
+           "/usr/local/MacGPG2/bin" ":"
+           "/opt/X11/bin" ":"
+           "/Applications/Wireshark.app/Contents/MacOS:"
+           "/Users/Mike/Code/Scripts" ":"
+           (getenv "PATH")))
+
+  ;; load other user config files
+  (add-to-list 'load-path "~/spacemacs/")
+  (load "user_functions") ;; assorted functions
+  (load "user_org")       ;; org-mode config
+  (load "user_keys")      ;; keymaps
+  (load "user_face")      ;; appearance of emacs
+
+  ;; timeout from typing to selection in evil-avy-goto-char-timer
+  (setq avy-timeout-seconds 0.35)
+
+  ;; indentation levels for different modes/situations
   (setq c-basic-offset 2)
+  (setq LaTeX-indent-level 0)
+  (setq LaTeX-item-indent 0)
 
-  (defadvice org-capture-finalize
-      (after delete-capture-frame activate)
-    "Advise capture-finalize to close the frame"
-    (if (equal "remember" (frame-parameter nil 'name))
-        (delete-frame)))
-
-  (defadvice org-capture-destroy
-      (after delete-capture-frame activate)
-    "Advise capture-destroy to close the frame"
-    (if (equal "remember" (frame-parameter nil 'name))
-        (delete-frame)))
-
-  (defun make-orgcapture-frame ()
-    "Create a new frame and run org-capture."
-    (interactive)
-    (make-frame '((name . "remember")
-                  (width . 80) (height . 16) (top . 400) (left . 300)
-                  (font . "-apple-Monaco-medium-normal-normal-*-13-*-*-*-m-0-iso10646-1")))
-    (select-frame-by-name "remember")
-    (delete-other-windows)
-    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-            (org-capture)))
-
-  (defun find-user-config ()
-    "Edit the `user-config', in the current window."
-    (interactive)
-    (find-file-existing "~/spacemacs/user_config.el"))
-  (defun find-user-init ()
-    "Edit the `user-init', in the current window."
-    (interactive)
-    (find-file-existing "~/spacemacs/user_init.el"))
-
-  ;; insert mode keymaps ;;
-  (setq-default evil-escape-key-sequence "jk")
-
-  ;; leader keymaps ;;
-  (spacemacs/set-leader-keys
-    "d" 'other-window
-    "fec" 'find-user-config
-    "feC" 'find-user-init)
-
-  ;; powerline settings
-  (setq powerline-default-separator 'arrow)
-
+  ;; syntax checking
   ;; disable flyspell by default
   (setq-default dotspacemacs-configuration-layers
                 '((spell-checking :variables spell-checking-enable-by-default nil)))
   (spacemacs/set-default-font dotspacemacs-default-font)
+  ;; only perform flycheck on file save, *not* when a newline is created
+  (setq flycheck-check-syntax-automatically '(save))
 
-  (require 'pretty-mode)
-  (global-pretty-mode t)
-  (pretty-activate-groups
-   '(:greek :arithmetic-nary :punctuation))
-  ;; :sub-and-superscripts
+  ;; appearance
 
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearance . dark))
-
-  ;; org-mode config ;;
-  ;; Allow a space between org headings
-  (setq org-cycle-separator-lines 1)
-  ;; Exporting org files as Bootstrap html
-  (require 'ox-publish)
-  (setq org-publish-project-alist
-        '(("org-notes"
-           :base-directory "~/org/"
-           :publishing-directory "~/public_html/"
-           :publishing-function org-twbs-publish-to-html
-           :with-sub-superscript nil
-           :padline no)))
-
+  ;; insert mode in shell buffers scrolls to bottom
   (setq comint-scroll-to-bottom-on-input t)
+
+  ;; keep history short to prevent any issues with large savehist lagging
+  (setq history-length 100)
+  (put 'minibuffer-history 'history-length 50)
+  (put 'evil-ex-history 'history-length 50)
+  (put 'kill-ring 'history-length 25)
+
+  ;; Stop :q from killing the frame
+  (evil-ex-define-cmd "q" 'kill-this-buffer)
+  ;; Need to type out :quit to close emacs
+  (evil-ex-define-cmd "quit" 'evil-quit)
 
 )

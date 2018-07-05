@@ -1,12 +1,15 @@
 (defun dotspacemacs/user-init ()
 
-  mac-right-option-modifier nil
+  (message "user-init started")
 
-  (setq powerline-default-separator 'arrow)
-  (setq powerline-height 35)
-  (setq powerline-image-apple-rgb t)
-  ;; (setq ns-use-srgb-colorspace nil)
+  ;; remove title from top of frame
+  (setq dotspacemacs-frame-title-format nil)
 
   ;; Start the emacs daemon
   (server-start)
+  ;; starting org-protocol in init might be required to work in emacs-port?
+  (require 'org-protocol)
+
+  (message "user-init completed")
+
 )

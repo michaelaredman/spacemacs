@@ -3,5 +3,5 @@
 ** Description
 
 - My dotfiles for [[https://github.com/syl20bnr/spacemacs][Spacemacs]].
-- Both the ~user-init~ and ~user-config~ functions are split into their own files.
-- Root folder needs to be symlinked to ~~/.emacs.d/~ and ~./spacemacs~ to ~~/.spacemacs~.
+- Both the =user-init= and =user-config= functions are split into their own files.
+- Root folder needs to be symlinked to =~/.emacs.d/= and =./spacemacs= to =~/.spacemacs=.
